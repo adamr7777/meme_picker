@@ -3,6 +3,9 @@ import { catsData } from './data.js';
 const emotionRadios = document.getElementById('emotion-radios');
 const getImageBtn = document.getElementById('get-image-btn');
 const gifsOnly = document.getElementById('gifs-only-option');
+const memeModal = document.getElementById('meme-modal');
+const memeModalInner = document.getElementById('meme-modal-inner');
+const memeModalClose = document.getElementById('meme-modal-close-btn');
 
 //functions
 function getEmotionsArray(cats) {
@@ -15,7 +18,7 @@ function getEmotionsArray(cats) {
     }
   }
   return emotionsArray;
-};
+}
 
 function lightOptions(event) {
   const emotionId = event.target.id;
@@ -46,22 +49,52 @@ function renderRadios(cats) {
 function getClickedItem() {
   if (document.querySelector('input[type="radio"]:checked')) {
     const clickedItem = document.querySelector('input[type="radio"]:checked').value;
+    const isGif = gifsOnly.checked;
     const selectedCats = catsData.filter(function(obj) {
-      return obj.emotionTags.includes(clickedItem);
-      //add code1
+        if (isGif) {
+          return obj.isGif && obj.emotionTags.includes(clickedItem);
+        }
+        else {
+          return obj.emotionTags.includes(clickedItem);
+        }
     })
-    console.log(selectedCats);
+    return selectedCats;
   }
-  const isGif = gifsOnly.checked; //code1
-  console.log(isGif);            //code1
+}
+
+function narrowDown() {
+  const catsArray = getClickedItem();
+    if (catsArray.length === 1) {
+      return catsArray[0];
+    }
+    else {
+      const randNum = Math.floor(Math.random()*catsArray.length);
+      return catsArray[randNum];
+    }
+}
+
+function renderCat() {
+  const catObj = narrowDown();
+  memeModalInner.innerHTML =
+      `<img
+        class="cat-img"
+        src="./images/${catObj.image}"
+        alt="${catObj.alt}"
+        >`
+  memeModal.style.display = 'flex';
+}
+
+function closeModal() {
+  memeModal.style.display = 'none';
 }
 
 
 //event listeners
 emotionRadios.addEventListener('change', lightOptions);
 
-getImageBtn.addEventListener('click', getClickedItem);
+getImageBtn.addEventListener('click', renderCat);
 
+memeModalClose.addEventListener('click', closeModal);
 
 
 
